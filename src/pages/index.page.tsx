@@ -6,6 +6,7 @@ export default function Home() {
     <Layout>
       <SEO title="Home" description="This is the home page" />
       <h1 className="text-3xl font-bold underline">Hello world!</h1>
+      <h1>This is test Vercel</h1>
     </Layout>
   );
 }
