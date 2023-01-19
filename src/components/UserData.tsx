@@ -1,6 +1,6 @@
 import { Data } from "@/types/pencerdasan/data";
 
-export default function UserData(userData: Data) {
+export default function UserInformation(userData: Data) {
   return (
     <>
       <div className="flex flex-col border-2 border-black w-96 rounded-xl px-4 py-2">
