@@ -1,8 +1,17 @@
+import { useMutation } from "@tanstack/react-query";
+import axios, { AxiosError } from "axios";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 type LoginForm = {
-  username: string;
+  email: string;
   password: string;
+};
+
+type ErrorMessage = {
+  success: boolean;
+  message: string;
+  code: number;
 };
 
 export default function FormPage() {
@@ -11,7 +20,23 @@ export default function FormPage() {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginForm>();
-  const onSubmit = (data: LoginForm) => console.log(data);
+
+  const [response, setResponse] = useState("");
+
+  const { mutate } = useMutation({
+    mutationFn: (newUser: LoginForm) => {
+      return axios.post("https://itsexpo.robby.pw/api/login_user", newUser);
+    },
+    onSuccess: (data) => {
+      setResponse(data?.data.message);
+    },
+    onError: (error: AxiosError) => {
+      const data = error.response?.data as ErrorMessage;
+      setResponse(data.message);
+    },
+  });
+
+  const onSubmit = (data: LoginForm) => mutate(data);
 
   return (
     <div className="flex flex-col justify-start items-center">
@@ -20,32 +45,32 @@ export default function FormPage() {
         className="flex flex-col justify-center items-center w-72 h-screen"
       >
         <h1 className="font-bold text-4xl mb-4">Sign Up</h1>
-        <label htmlFor="username" className="text-left w-full">
-          Username
+        <label htmlFor="email" className="text-left w-full">
+          Email
         </label>
         <input
           type="text"
-          id="username"
-          {...register("username", {
+          id="email"
+          {...register("email", {
             required: true,
             minLength: 3,
             maxLength: 30,
           })}
-          placeholder="Enter Your Username"
+          placeholder="Enter Your email"
           className="w-full"
         />
 
-        {errors.username?.type === "required" && (
+        {errors.email?.type === "required" && (
           <span className="text-left">This is required!</span>
         )}
-        {errors.username?.type === "minLength" && (
+        {errors.email?.type === "minLength" && (
           <span className="text-left">
-            Username must consists at least 3 characters!
+            email must consists at least 3 characters!
           </span>
         )}
-        {errors.username?.type === "maxLength" && (
+        {errors.email?.type === "maxLength" && (
           <span className="text-left">
-            Username consists of 30 characters maximum!
+            email consists of 30 characters maximum!
           </span>
         )}
 
@@ -69,7 +94,7 @@ export default function FormPage() {
         )}
         {errors.password?.type === "minLength" && (
           <span className="text-left">
-            Password must consists at least 3 characters!
+            Password must consists at least 8 characters!
           </span>
         )}
         {errors.password?.type === "maxLength" && (
@@ -84,6 +109,8 @@ export default function FormPage() {
         >
           Sign Up
         </button>
+
+        <span className="mt-2">{response}</span>
       </form>
     </div>
   );
